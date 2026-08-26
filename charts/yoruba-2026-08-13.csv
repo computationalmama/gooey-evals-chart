@@ -1,0 +1,23 @@
+# title: Yoruba Evaluation of Audio AI Models
+# country: NG
+# byline: Gooey.AI, ClearGlobal and the Gates Foundation
+# date: 2026-08-13
+# url: Gooey.AI/language
+# x: Accuracy, 0, 1, 0.1
+# y: Latency, 0, 35, 5
+Workflow,Accuracy (mean),Latency (median)
+GPT 5.6 Sol,0.27,14.60
+Claude Fable 5,0.36,14.27
+Gemini 3.1 Pro,0.57,11.36
+Kimi K3,0.18,32.51
+MiniMax M3,0.09,10.80
+GPT 5.6 Sol + Omni,0.61,13.53
+GPT 5.6 Sol + Intron,0.60,17.45
+Claude Fable 5 + Omni,0.52,14.36
+Claude Fable 5 + Intron,0.68,17.76
+Gemini 3.1 Pro + Omni,0.59,13.11
+Gemini 3.1 Pro + Intron,0.61,17.00
+Kimi K3 + Omni,0.37,27.62
+Kimi K3 + Intron,0.57,31.84
+MiniMax M3 + Omni,0.27,10.52
+MiniMax M3 + Intron,0.39,14.83

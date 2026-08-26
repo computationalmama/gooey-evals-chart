@@ -1,0 +1,6 @@
+<svg viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1">
+  <path d="M30 2 L58 30 L30 58 L2 30 Z"/>
+  <path d="M30 14 L46 30 L30 46 L14 30 Z"/>
+  <path d="M0 0 L14 0 M0 0 L0 14 M60 60 L46 60 M60 60 L60 46"/>
+  <circle cx="30" cy="30" r="3.4"/>
+</svg>

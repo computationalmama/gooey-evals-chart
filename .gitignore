@@ -1,0 +1,9 @@
+# Generated. `node build.mjs && node build-app.mjs` recreates all of it.
+dist/
+
+# assets/fonts/cache/ is deliberately NOT ignored — it is committed so that rebuilds
+# work offline. See the Fonts section of CLAUDE.md.
+
+.DS_Store
+node_modules/
+*.log

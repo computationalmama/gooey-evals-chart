@@ -1,0 +1,90 @@
+# Publishes the chart maker to GitHub Pages on every push to main.
+#
+# The app build needs neither Chrome nor the network, so the site always deploys.
+# Building the charts themselves does need headless Chrome, so that step is
+# best-effort: if it fails the chart maker still ships, and the log says what is missing.
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build the chart maker
+        run: node build-app.mjs
+
+      - name: Build the charts
+        id: charts
+        continue-on-error: true
+        run: |
+          CHROME_BIN="$(command -v google-chrome || command -v chromium-browser || true)"
+          if [ -z "$CHROME_BIN" ]; then
+            echo "::warning::No Chrome on the runner — skipping the charts. The chart maker still deploys."
+            exit 1
+          fi
+          CHROME="$CHROME_BIN" node build.mjs
+
+      - name: Stage the site
+        run: |
+          mkdir -p _site/charts
+          # the bare Pages URL opens the chart maker
+          cp dist/app.html _site/index.html
+          # and each built chart, so the iframe embed URLs resolve. *.embed.html is a
+          # paste-in snippet with no page wrapper, so it is not served.
+          shopt -s nullglob
+          for f in dist/*.html; do
+            base="$(basename "$f")"
+            case "$base" in index.html|app.html|*.embed.html) continue ;; esac
+            cp "$f" "_site/charts/$base"
+          done
+          echo "Staged:" && find _site -type f | sort
+
+      - name: Report
+        run: |
+          {
+            echo "### Chart maker"
+            echo ""
+            echo "Deployed to \`/\` — paste a CSV and download the PNG."
+            echo ""
+            if [ "${{ steps.charts.outcome }}" = "success" ]; then
+              echo "Charts built and published under \`/charts/\`:"
+              echo ""
+              for f in _site/charts/*.html; do echo "- \`$(basename "$f")\`"; done
+            else
+              echo "> The chart build step did not run to completion, so \`/charts/\` may be empty."
+              echo "> The chart maker itself is unaffected."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4

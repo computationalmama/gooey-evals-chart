@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eval chart maker &middot; Gooey.AI</title>
+<meta name="description" content="Paste an eval CSV, get the plotted chart, download the 2x PNG and the embed.">
+<style>/*__APP_CSS__*/</style>
+</head>
+<body>
+
+<header id="top">
+  <h1>Eval chart maker</h1>
+  <p>Paste or drop a CSV. The chart is <strong>plotted from the numbers</strong> &mdash; ties line
+     up exactly, <em>Fastest</em> and <em>Most Accurate</em> are computed, nothing is clipped.</p>
+</header>
+
+<main>
+<!-- ─── left: input ────────────────────────────────────────────────────────── -->
+<section id="left">
+
+  <div class="panel" id="drop">
+    <div class="panel-hd">
+      <h2>1 &middot; Your data</h2>
+      <div class="hd-actions">
+        <button type="button" class="ghost" id="pick">Choose file&hellip;</button>
+        <select id="examples" aria-label="Load an example">
+          <option value="">Load an example&hellip;</option>
+        </select>
+      </div>
+    </div>
+    <input type="file" id="file" accept=".csv,.tsv,.txt,text/csv,text/plain" hidden>
+    <textarea id="csv" spellcheck="false" autocomplete="off"
+      placeholder="Paste here — straight from Google Sheets or Excel is fine (tabs are handled).
+
+Workflow&#9;Accuracy (mean)&#9;Latency (median)
+GPT 5.6 Sol&#9;0.27&#9;14.60
+Claude Fable 5 + Intron&#9;0.68&#9;17.76
+
+Only three columns matter: a name, an accuracy and a latency.
+Column titles are matched loosely, extra columns are ignored."></textarea>
+    <p class="hint" id="parsehint">Waiting for data&hellip;</p>
+    <div id="dropveil"><span>Drop the CSV</span></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hd"><h2>2 &middot; Titles &amp; labels</h2></div>
+    <div class="grid">
+      <label class="f span2">Title
+        <input id="m-title" type="text" placeholder="Yoruba Evaluation of Audio AI Models">
+      </label>
+      <label class="f">Date
+        <input id="m-date" type="date">
+      </label>
+      <label class="f">Country motif
+        <select id="m-country">
+          <option value="">None (default pattern)</option>
+          <option value="NG">NG &middot; Nigeria</option>
+          <option value="KE">KE &middot; Kenya</option>
+          <option value="RW">RW &middot; Rwanda</option>
+          <option value="IN">IN &middot; India</option>
+        </select>
+      </label>
+      <label class="f span2">Byline <span class="sub">text before the first comma is bolded</span>
+        <input id="m-byline" type="text" placeholder="Gooey.AI, ClearGlobal and the Gates Foundation">
+      </label>
+      <label class="f span2">Trailing URL
+        <input id="m-url" type="text" placeholder="Gooey.AI/language">
+      </label>
+      <label class="f">Note under the x&nbsp;axis
+        <input id="m-xnote" type="text" placeholder="More accurate">
+      </label>
+      <label class="f">Note beside the y&nbsp;axis
+        <input id="m-ynote" type="text" placeholder="Lower is better">
+      </label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-hd">
+      <h2>3 &middot; Axes</h2>
+      <span class="hd-note">Auto-scales to round ticks. Untick to pin.</span>
+    </div>
+    <div class="axes">
+      <div class="axis-row" data-axis="x">
+        <span class="axis-tag">X</span>
+        <label class="chk"><input type="checkbox" id="x-auto" checked> Auto</label>
+        <label class="f grow">Name<input id="x-name" type="text" placeholder="Accuracy"></label>
+        <label class="f n">Min<input id="x-min" type="text" inputmode="decimal"></label>
+        <label class="f n">Max<input id="x-max" type="text" inputmode="decimal"></label>
+        <label class="f n">Step<input id="x-step" type="text" inputmode="decimal"></label>
+      </div>
+      <div class="axis-row" data-axis="y">
+        <span class="axis-tag">Y</span>
+        <label class="chk"><input type="checkbox" id="y-auto" checked> Auto</label>
+        <label class="f grow">Name<input id="y-name" type="text" placeholder="Latency"></label>
+        <label class="f n">Min<input id="y-min" type="text" inputmode="decimal"></label>
+        <label class="f n">Max<input id="y-max" type="text" inputmode="decimal"></label>
+        <label class="f n">Step<input id="y-step" type="text" inputmode="decimal"></label>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<!-- ─── right: chart, report, downloads ────────────────────────────────────── -->
+<section id="right">
+
+  <div class="panel sticky">
+    <div class="panel-hd">
+      <h2>Chart</h2>
+      <span class="hd-note" id="stage">idle</span>
+    </div>
+    <div id="stagewrap">
+      <div id="chart" aria-live="polite"></div>
+      <div id="empty">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="currentColor"
+             stroke-width="1.4" aria-hidden="true"><path d="M3 3v18h18"/><circle cx="8" cy="14" r="2"/>
+             <circle cx="14" cy="8" r="2"/><circle cx="18" cy="15" r="2"/></svg>
+        <p>Your chart appears here the moment the data parses.</p>
+      </div>
+    </div>
+    <div id="tip" role="status" aria-live="polite"></div>
+  </div>
+
+  <div class="panel" id="reportpanel" hidden>
+    <div class="panel-hd">
+      <h2>Build report</h2>
+      <span id="verdict" class="badge">&nbsp;</span>
+    </div>
+    <p class="hint">Confirm these against your source data &mdash; catching a wrong
+       <em>fastest</em> or <em>most&nbsp;accurate</em> is the whole point.</p>
+    <dl id="report"></dl>
+    <ul id="notes"></ul>
+  </div>
+
+  <div class="panel" id="dlpanel" hidden>
+    <div class="panel-hd">
+      <h2>Download</h2>
+      <label class="f n hd-scale">PNG scale
+        <select id="scale">
+          <option value="1">1&times;</option>
+          <option value="2" selected>2&times;</option>
+          <option value="3">3&times;</option>
+        </select>
+      </label>
+    </div>
+    <p class="hint">File name
+       <input id="slug" class="slugin" spellcheck="false" autocomplete="off"
+              aria-label="File name"><span class="slugext">.png</span></p>
+    <div class="dl">
+      <button type="button" class="primary" id="dl-png">
+        <b>PNG</b><span id="pngdim">2826 &times; 1504</span>
+      </button>
+      <button type="button" id="dl-html">
+        <b>Standalone HTML</b><span>self-contained, for the iframe embed</span>
+      </button>
+      <button type="button" id="dl-embed">
+        <b>Webflow embed</b><span id="embedchars">paste into an Embed element</span>
+      </button>
+      <button type="button" id="dl-csv">
+        <b>CSV</b><span>with the <code>#</code> block, for <code>charts/</code></span>
+      </button>
+    </div>
+    <details id="iframebox">
+      <summary>iframe snippet</summary>
+      <pre id="iframecode"></pre>
+      <button type="button" class="ghost" id="copyiframe">Copy</button>
+    </details>
+  </div>
+
+</section>
+</main>
+
+<footer>
+  <p>Same renderer, same assertions as <code>node build.mjs</code> &mdash; the layout solver
+     runs right here in your browser. Nothing is uploaded anywhere.</p>
+</footer>
+
+<script>/*__APP_JS__*/</script>
+</body>
+</html>

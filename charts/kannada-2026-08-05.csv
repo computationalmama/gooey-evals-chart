@@ -1,0 +1,18 @@
+# title: Kannada Evaluation of Audio AI Models
+# country: IN
+# byline: Gooey.AI, ClearGlobal and the Gates Foundation
+# date: 2026-08-24
+# url: Gooey.AI/language
+# x: Accuracy, 0, 1, 0.1
+# y: Latency, 0, 45, 5
+
+Workflow,	Accuracy (mean),	Latency (median)
+0 Gemini 3.1 Pro,	0.93,	12.60
+1 Gemini 3.1 Pro + Omni,	0.83,	18.80
+2 GPT 5.6 Sol + Omni,	0.59,	17.70
+3 Claude Opus 5 + Omni,	0.62,	18.69
+4 Kimi K3 + Omni,	0.59,	24.84
+5 Gemini 3.1 Pro + Saaras V3,	0.92,	26.38
+6 GPT 5.6 Sol + Saaras V3,	0.57,	25.14
+7 Claude Opus 5 + Saaras V3,	0.62,	27.95
+8 Kimi K3 + Saaras V3,	0.64,	40.92

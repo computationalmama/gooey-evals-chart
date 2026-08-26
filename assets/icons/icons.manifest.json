@@ -1,0 +1,14 @@
+{
+  "brain": {
+    "file": "brain.png",
+    "mode": "bare",
+    "w": 25,
+    "h": 22
+  },
+  "rabbit": {
+    "file": "rabbit.png",
+    "mode": "bare",
+    "w": 23,
+    "h": 23
+  }
+}

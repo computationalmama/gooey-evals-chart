@@ -1,0 +1,11 @@
+# title: Swahili Evaluation of Audio AI Models
+# country: KE
+# byline: Gooey.AI, ClearGlobal and the Gates Foundation
+# date: 2026-08-24
+# url: Gooey.AI/language
+# x: Accuracy, 0, 1, 0.1
+# y: Latency, 0, 35, 5
+Workflow,Accuracy (mean),Latency (median)
+GPT 5.6 Sol,0.27,14.60
+Claude Fable 5,0.36,14.27
+Gemini 3.1 Pro,0.57,11.36

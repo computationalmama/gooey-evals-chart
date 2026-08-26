@@ -1,0 +1,17 @@
+{
+  "name": "gooey-evals-chart",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Deterministic language-eval scatter charts for Gooey.AI/language",
+  "scripts": {
+    "build": "node build.mjs",
+    "png": "node export-png.mjs",
+    "all": "node build.mjs && node export-png.mjs",
+    "app": "node build-app.mjs",
+    "open": "node build-app.mjs && open dist/app.html",
+    "verify": "node build.mjs && node build-app.mjs && node verify-app.mjs",
+    "test": "node build.mjs tests/*.csv",
+    "logos": "python3 tools/extract_logos.py"
+  }
+}

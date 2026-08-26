@@ -1,0 +1,50 @@
+{
+  "openai": {
+    "file": "openai.png",
+    "mode": "tile",
+    "w": 26,
+    "h": 26
+  },
+  "moonshot": {
+    "file": "moonshot.png",
+    "mode": "tile",
+    "w": 25,
+    "h": 26
+  },
+  "anthropic": {
+    "file": "anthropic.png",
+    "mode": "tile",
+    "w": 26,
+    "h": 26
+  },
+  "intron": {
+    "file": "intron.png",
+    "mode": "tile",
+    "w": 26,
+    "h": 26
+  },
+  "google": {
+    "file": "google.png",
+    "mode": "bare",
+    "w": 26,
+    "h": 28
+  },
+  "meta": {
+    "file": "meta.png",
+    "mode": "bare",
+    "w": 28,
+    "h": 22
+  },
+  "minimax": {
+    "file": "minimax.png",
+    "mode": "bare",
+    "w": 25,
+    "h": 23
+  },
+  "gooey": {
+    "file": "gooey.png",
+    "mode": "bare",
+    "w": 33,
+    "h": 30
+  }
+}
