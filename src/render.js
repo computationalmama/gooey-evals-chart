@@ -56,8 +56,9 @@ const fmtTick = (v, step) => {
   return step < 1 ? v.toFixed(Math.max(1, d)) : String(Math.round(v));
 };
 
-/** data: from parseChartCsv. assets: { logos, icons, motif } already as data URIs. */
-export function renderChart(data, assets) {
+/** data: from parseChartCsv. assets: { logos, icons, motif } already as data URIs.
+ *  adjustments: optional { i: { dx, dy } } map of manual position offsets. */
+export function renderChart(data, assets, adjustments = {}) {
   const img = makeImg();
   const { sx, sy } = buildScales(data.axes, PLOT);
   const fastest = new Set(data.fastest);
@@ -196,8 +197,10 @@ __SYMBOLS__
   const leaders = [];
   items.forEach((it, k) => {
     const p = pills[k];
+    const adj = adjustments[it.i] || { dx: 0, dy: 0 };
+    const adjPill = { x: p.x + adj.dx, y: p.y + adj.dy, w: p.w, h: p.h };
     const pt = { x: it.cx, y: it.cy };
-    const a = leaderAnchor(p, pt);
+    const a = leaderAnchor(adjPill, pt);
     const d = Math.hypot(pt.x - a.x, pt.y - a.y);
     if (d <= POINT.r + 1) return;
     const t = (d - POINT.r) / d;
@@ -208,14 +211,17 @@ __SYMBOLS__
   // pills
   items.forEach((it, k) => {
     const p = pills[k];
+    const adj = adjustments[it.i] || { dx: 0, dy: 0 };
+    const px = p.x + adj.dx;
+    const py = p.y + adj.dy;
     const fill = it.hi ? C.highlight : C.pill;
     const stroke = it.hi ? C.highlightStroke : C.pillStroke;
     const tip = `${it.name} — ${data.axes.x.name} ${it.vx}, ${data.axes.y.name} ${it.vy}`;
     const b = [];
-    b.push(`<g class="gc-pill" data-i="${it.i}"><title>${esc(tip)}</title>`);
-    b.push(`<rect x="${n(p.x)}" y="${n(p.y)}" width="${n(p.w)}" height="${n(p.h)}" rx="${PILL.r}" fill="${fill}" stroke="${stroke}" stroke-width="${PILL.stroke}"/>`);
-    let cx = p.x + PILL.padX;
-    const midY = p.y + p.h / 2;
+    b.push(`<g class="gc-pill" data-i="${it.i}" data-ox="${n(p.x)}" data-oy="${n(p.y)}"><title>${esc(tip)}</title>`);
+    b.push(`<rect x="${n(px)}" y="${n(py)}" width="${n(p.w)}" height="${n(p.h)}" rx="${PILL.r}" fill="${fill}" stroke="${stroke}" stroke-width="${PILL.stroke}"/>`);
+    let cx = px + PILL.padX;
+    const midY = py + p.h / 2;
     if (it.leadD) { b.push(img(it.lead, cx, midY - it.leadD.h / 2, it.leadD.w, it.leadD.h)); cx += it.leadD.w + PILL.gap; }
     b.push(`<text x="${n(cx)}" y="${n(midY + 6)}" fill="${C.ink}" ${font(TYPE.label)}>${esc(it.name)}</text>`);
     cx += it.textW;

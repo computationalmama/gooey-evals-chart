@@ -9,6 +9,7 @@ const RULES = [
   [/kimi|moonshot|\bk[0-9]/i, "moonshot"],
   [/minimax/i,                "minimax"],
   [/omni|llama|\bmeta\b/i,    "meta"],
+  [/deepseek/i,               "deepseek"],
   [/intron/i,                 "intron"],
   [/gooey/i,                  "gooey"],
 ];

@@ -62,7 +62,7 @@ const DIRS = Array.from({ length: 24 }, (_, k) => {
   const a = (k * Math.PI * 2) / 24;
   return { ux: Math.cos(a), uy: Math.sin(a) };
 });
-const GAPS = [11, 16, 24, 34, 48, 66, 88];
+const GAPS = [11, 16, 24, 34, 48, 66, 88, 110, 136, 166, 200, 240, 285];
 
 function candidates(item, bounds) {
   const out = [];
@@ -81,7 +81,7 @@ function candidates(item, bounds) {
   return out;
 }
 
-const W = { pill: 3.0, dot: 2.4, leaderPill: 420, leaderLeader: 150, len: 7.0, bias: 3 };
+const W = { pill: 8000, dot: 6000, leaderPill: 420, leaderLeader: 150, len: 7.0, bias: 3 };
 
 function cost(cand, idx, placed, items, dots, fixed) {
   let c = cand.gap * W.len + cand.bias * W.bias;
@@ -111,7 +111,7 @@ function cost(cand, idx, placed, items, dots, fixed) {
  * deterministic: the same data always gives the same layout.
  */
 export function solveLabels(items, bounds, dotR, seed = 0x9e3779b9, opts = {}) {
-  const RESTARTS = opts.restarts ?? 120;
+  const RESTARTS = opts.restarts ?? 480;
   const fixed = opts.fixed ?? [];   // axis notes etc. — immovable, must not be covered
   const PASSES = opts.passes ?? 40;
 

@@ -32,7 +32,7 @@ export const TYPE = {
   axisName: { family: "Inter",  weight: 400, size: 22 },
   tick:     { family: "Inter",  weight: 400, size: 18 },
   note:     { family: "Inter",  weight: 400, size: 15 },
-  label:    { family: "Inter",  weight: 400, size: 17 },
+  label:    { family: "Inter",  weight: 400, size: 14 },
   badge:    { family: "Inter",  weight: 600, size: 15 },
   pointNum: { family: "Inter",  weight: 600, size: 12 },
   footer:   { family: "Inter",  weight: 400, size: 19 },
@@ -50,6 +50,6 @@ export const ANCHOR = {
   tickBaselineGapY: 26,     // x-tick baseline below the axis
 };
 
-export const PILL = { h: 32, r: 10, padX: 9, gap: 7, stroke: 1.6, chip: 22 };
+export const PILL = { h: 26, r: 10, padX: 6, gap: 5, stroke: 1.6, chip: 19 };
 export const POINT = { r: 9.5, stroke: 1.6 };
 export const LEADER = { width: 1.4 };

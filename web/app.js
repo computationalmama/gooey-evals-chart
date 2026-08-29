@@ -24,6 +24,7 @@ const el = {
   reportpanel: $("reportpanel"), report: $("report"), notes: $("notes"), verdict: $("verdict"),
   dlpanel: $("dlpanel"), slug: $("slug"), scale: $("scale"), pngdim: $("pngdim"),
   embedchars: $("embedchars"), iframecode: $("iframecode"),
+  draggable: $("draggable"), resetPositions: $("reset-positions"),
 };
 const META_FIELDS = ["title", "date", "country", "byline", "url", "xnote", "ynote"];
 
@@ -35,6 +36,8 @@ const state = {
   fontsEmbedded: true,
   token: 0,
   syncing: false,
+  adjustments: {},    // manual label position adjustments: { i: { dx, dy } }
+  draggable: false,   // whether labels can be dragged
 };
 
 // ── input normalising ────────────────────────────────────────────────────────
@@ -298,7 +301,7 @@ async function render() {
   };
   let res;
   try {
-    res = renderChart(data, assets);
+    res = renderChart(data, assets, state.adjustments);
   } catch (e) {
     stage("render failed", "err");
     el.parsehint.textContent = "⚠ " + e.message;
@@ -310,6 +313,7 @@ async function render() {
   el.chart.classList.remove("stale");
   el.chart.innerHTML = svg;
   wireTooltip();
+  if (state.draggable) wireDragging();
 
   const slug = slugify(data.title, state.meta.date);
   if (!state.slugDirty) el.slug.value = slug;
@@ -478,12 +482,117 @@ function wireTooltip() {
   root.addEventListener("mouseleave", hide);
 }
 
+// ── dragging labels ──────────────────────────────────────────────────────────
+function wireDragging() {
+  const root = el.chart;
+  const svg = root.querySelector("svg");
+  if (!svg) return;
+
+  const pills = [...root.querySelectorAll(".gc-pill")];
+  let dragState = null;
+
+  const getSVGPoint = (e) => {
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    return pt.matrixTransform(svg.getScreenCTM().inverse());
+  };
+
+  for (const pill of pills) {
+    pill.style.cursor = "move";
+
+    pill.addEventListener("mousedown", e => {
+      if (e.button !== 0) return;
+      e.preventDefault();
+
+      const i = parseInt(pill.getAttribute("data-i"), 10);
+      const ox = parseFloat(pill.getAttribute("data-ox"));
+      const oy = parseFloat(pill.getAttribute("data-oy"));
+      const adj = state.adjustments[i] || { dx: 0, dy: 0 };
+      const start = getSVGPoint(e);
+
+      dragState = { i, ox, oy, startX: start.x, startY: start.y, startDx: adj.dx, startDy: adj.dy };
+      pill.style.opacity = "0.7";
+    });
+  }
+
+  const handleMove = e => {
+    if (!dragState) return;
+    e.preventDefault();
+
+    const pt = getSVGPoint(e);
+    const dx = dragState.startDx + (pt.x - dragState.startX);
+    const dy = dragState.startDy + (pt.y - dragState.startY);
+
+    state.adjustments[dragState.i] = { dx, dy };
+    quickUpdate(dragState.i);
+  };
+
+  const handleUp = e => {
+    if (!dragState) return;
+    e.preventDefault();
+
+    const pill = pills.find(p => parseInt(p.getAttribute("data-i"), 10) === dragState.i);
+    if (pill) pill.style.opacity = "";
+
+    dragState = null;
+    el.resetPositions.hidden = Object.keys(state.adjustments).length === 0;
+    render();  // full re-render to update leaders and everything
+  };
+
+  svg.addEventListener("mousemove", handleMove);
+  svg.addEventListener("mouseup", handleUp);
+  svg.addEventListener("mouseleave", handleUp);
+}
+
+// Quick visual update during drag - just moves the pill, doesn't recalc leaders
+function quickUpdate(i) {
+  const pill = el.chart.querySelector(`.gc-pill[data-i="${i}"]`);
+  if (!pill) return;
+
+  const adj = state.adjustments[i];
+  const ox = parseFloat(pill.getAttribute("data-ox"));
+  const oy = parseFloat(pill.getAttribute("data-oy"));
+
+  // Update all child elements with absolute positioning
+  const rect = pill.querySelector("rect");
+  const texts = pill.querySelectorAll("text");
+  const uses = pill.querySelectorAll("use");
+
+  if (rect) {
+    rect.setAttribute("x", ox + adj.dx);
+    rect.setAttribute("y", oy + adj.dy);
+  }
+
+  // For text and use elements, we need to get their original offset from the pill origin
+  // This is a simplified approach - the full render handles this properly
+  const dx = adj.dx;
+  const dy = adj.dy;
+
+  texts.forEach(t => {
+    const origX = parseFloat(t.getAttribute("x")) - dx;
+    const origY = parseFloat(t.getAttribute("y")) - dy;
+    t.setAttribute("x", origX + adj.dx);
+    t.setAttribute("y", origY + adj.dy);
+  });
+
+  uses.forEach(u => {
+    const origX = parseFloat(u.getAttribute("x")) - dx;
+    const origY = parseFloat(u.getAttribute("y")) - dy;
+    u.setAttribute("x", origX + adj.dx);
+    u.setAttribute("y", origY + adj.dy);
+  });
+}
+
 // ── loading data ─────────────────────────────────────────────────────────────
 function ingest(text, filename) {
   const { meta, table } = splitMeta(normalizePaste(text));
   el.csv.value = table;        // the box holds the rows; the "#" block edits as a form
   state.table = table;
   state.meta = meta;
+  // Clear adjustments when loading new data
+  state.adjustments = {};
+  el.resetPositions.hidden = true;
   // A named file keeps its name; a bare paste goes back to tracking the title.
   state.slugDirty = Boolean(filename);
   if (filename) el.slug.value = filename.replace(/\.(csv|tsv|txt)$/i, "");
@@ -526,6 +635,24 @@ el.slug.addEventListener("input", () => {
   if (state.last) downloads(state.last);
 });
 el.scale.addEventListener("change", setScaleLabel);
+
+el.draggable.addEventListener("change", () => {
+  state.draggable = el.draggable.checked;
+  el.resetPositions.hidden = !state.draggable || Object.keys(state.adjustments).length === 0;
+  if (state.draggable) {
+    wireDragging();
+  } else {
+    // Remove cursor styles when disabling
+    const pills = [...el.chart.querySelectorAll(".gc-pill")];
+    pills.forEach(p => { p.style.cursor = ""; });
+  }
+});
+
+el.resetPositions.addEventListener("click", () => {
+  state.adjustments = {};
+  el.resetPositions.hidden = true;
+  render();
+});
 
 el.pick.addEventListener("click", () => el.file.click());
 el.file.addEventListener("change", async () => {
