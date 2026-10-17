@@ -248,16 +248,13 @@ __SYMBOLS__
   });
 
   // footer
-  const fIcon = chipDims(assets.logos.gooey, 26);
+  const fIcon = chipDims(assets.logos.gooey, 18);
   const cw = measure("© 2026", TYPE.footer);
-  const gw = measure("Gooey.AI", TYPE.footer);
-  const total = cw + 12 + fIcon.w + 7 + gw;
+  const total = cw + 12 + fIcon.w;
   let fx = CANVAS.w / 2 - total / 2;
   s.push(`<text x="${n(fx)}" y="${ANCHOR.footerBaseline}" fill="${C.ink2}" ${font(TYPE.footer)}>© ${esc((data.date.match(/\d{4}/) || ["2026"])[0])}</text>`);
   fx += cw + 12;
-  s.push(img(assets.logos.gooey, fx, ANCHOR.footerBaseline - 20, fIcon.w, fIcon.h));
-  fx += fIcon.w + 7;
-  s.push(`<text x="${n(fx)}" y="${ANCHOR.footerBaseline}" fill="${C.ink}" font-family="Inter" font-size="${TYPE.footer.size}" font-weight="700">Gooey.AI</text>`);
+  s.push(img(assets.logos.gooey, fx, ANCHOR.footerBaseline - 15, fIcon.w, fIcon.h));
 
   s.push(`</svg>`);
   const out = s.join("\n").replace("__SYMBOLS__", img.symbols());
