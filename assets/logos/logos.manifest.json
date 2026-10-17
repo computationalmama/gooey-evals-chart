@@ -29,6 +29,12 @@
     "w": 26,
     "h": 28
   },
+  "gemma": {
+    "file": "gemma.png",
+    "mode": "bare",
+    "w": 65,
+    "h": 65
+  },
   "meta": {
     "file": "meta.png",
     "mode": "bare",

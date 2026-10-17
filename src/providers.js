@@ -5,6 +5,7 @@
 const RULES = [
   [/\bgpt\b|openai|^o[0-9]/i, "openai"],
   [/claude|fable/i,           "anthropic"],
+  [/gemma/i,                  "gemma"],
   [/gemini|palm|bard/i,       "google"],
   [/kimi|moonshot|\bk[0-9]/i, "moonshot"],
   [/minimax/i,                "minimax"],
