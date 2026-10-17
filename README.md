@@ -3,6 +3,12 @@
 Deterministic, embeddable versions of the language-evaluation infographics for
 `Gooey.AI/language`. One CSV in, one self-contained HTML file out (plus a 2× PNG).
 
+**Updating from chat:** Open this repository in OpenCode and paste evaluator screenshots,
+a table, or CSV rows. The project skill at
+`.opencode/skills/update-eval-chart/SKILL.md` normalizes the values, asks for data approval
+before changing anything, generates and validates the chart, and prepares a focused PR when
+requested. You can also invoke it explicitly with `@update-eval-chart`.
+
 Replaces generating the chart as an AI image. Same visual language, but the numbers are
 now actually plotted: ties land on the same x pixel, `Fastest`/`Most Accurate` are
 computed from the data, and nothing gets clipped.

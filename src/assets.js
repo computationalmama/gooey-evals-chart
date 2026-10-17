@@ -4,7 +4,10 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 
-const dataUri = p => `data:image/png;base64,${readFileSync(p).toString("base64")}`;
+const dataUri = p => {
+  const mime = p.endsWith(".svg") ? "image/svg+xml" : "image/png";
+  return `data:${mime};base64,${readFileSync(p).toString("base64")}`;
+};
 
 function loadSet(dir, manifest) {
   const man = JSON.parse(readFileSync(join(dir, manifest), "utf8"));

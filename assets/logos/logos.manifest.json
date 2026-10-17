@@ -29,6 +29,12 @@
     "w": 26,
     "h": 28
   },
+  "gemma": {
+    "file": "gemma.png",
+    "mode": "bare",
+    "w": 128,
+    "h": 128
+  },
   "meta": {
     "file": "meta.png",
     "mode": "bare",
@@ -42,10 +48,10 @@
     "h": 23
   },
   "gooey": {
-    "file": "gooey.png",
+    "file": "gooey-ai-logo.svg",
     "mode": "bare",
-    "w": 33,
-    "h": 30
+    "w": 1208,
+    "h": 350
   },
   "deepseek": {
     "file": "deepseek.png",

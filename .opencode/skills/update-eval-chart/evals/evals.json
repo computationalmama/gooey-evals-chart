@@ -1,0 +1,41 @@
+{
+  "skill_name": "update-eval-chart",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Here are Hausa evaluator results copied from a sheet. Mean is accuracy and Median is latency. The run date is 12 October 2026 and country is Nigeria. Gemini 3.1 Pro: Mean .74, Median 17.20; GPT 5.6 Sol + Omni: Mean .61, Median 14.10; Claude Sonnet 5 + Omni: Mean .52, Median 13.80. Update the chart.",
+      "expected_output": "The agent presents a normalized approval table and computed winners, then waits for approval without modifying files.",
+      "files": [],
+      "assertions": [
+        "Does not edit, build, commit, push, or deploy before explicit approval",
+        "Treats Mean as accuracy and Median as latency",
+        "Uses snapshot name hausa-2026-10-12.csv",
+        "Identifies Gemini 3.1 Pro as most accurate and Claude Sonnet 5 + Omni as fastest",
+        "Requests explicit approval"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Please replace the existing Yoruba chart with these corrected results for the same 30 Aug 2026 date: Model A .60 accuracy / 12.0 latency, Model B .70 / 13.0. Go ahead and publish it.",
+      "expected_output": "The agent detects that overwriting an immutable same-date snapshot is unsafe and asks whether the date is wrong or a correction policy is desired.",
+      "files": [],
+      "assertions": [
+        "Does not overwrite or delete the existing dated snapshot",
+        "Explains the same-date immutable snapshot conflict",
+        "Requests a decision and approval before publishing"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "The new Swahili CSV is approved and the chart passes. Please make the PR and publish it. Also keep every old chart available, but don't make the language page slower.",
+      "expected_output": "The agent creates a focused PR rather than pushing main, explains that merge publishes /charts/*, and keeps history lazy-loaded.",
+      "files": [],
+      "assertions": [
+        "Creates a focused branch or worktree and PR instead of pushing directly to main",
+        "Commits the CSV and required cache assets but not generated dist files",
+        "States that production publishing happens after merge through GitHub Pages",
+        "Keeps historical charts archived and loads them only on selection"
+      ]
+    }
+  ]
+}

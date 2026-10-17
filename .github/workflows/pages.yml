@@ -29,6 +29,11 @@ jobs:
         with:
           node-version: 22
 
+      - name: Test the chat chart skill
+        run: |
+          python3 .opencode/skills/update-eval-chart/tests/test_build_and_validate.py
+          python3 -m json.tool .opencode/skills/update-eval-chart/evals/evals.json > /dev/null
+
       - name: Build the chart maker
         run: node build-app.mjs
 

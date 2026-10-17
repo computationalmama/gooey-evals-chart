@@ -7,6 +7,7 @@ import { buildScales, solveLabels, leaderAnchor, overlapReport, leaderStats, cro
 
 const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 const n = v => Math.round(v * 100) / 100;
+const fmtValue = v => Number(v).toFixed(2);
 
 let _ctx;
 function measure(text, t) {
@@ -216,7 +217,7 @@ __SYMBOLS__
     const py = p.y + adj.dy;
     const fill = it.hi ? C.highlight : C.pill;
     const stroke = it.hi ? C.highlightStroke : C.pillStroke;
-    const tip = `${it.name} — ${data.axes.x.name} ${it.vx}, ${data.axes.y.name} ${it.vy}`;
+    const tip = `${it.name} — ${data.axes.x.name} ${fmtValue(it.vx)}, ${data.axes.y.name} ${fmtValue(it.vy)}`;
     const b = [];
     b.push(`<g class="gc-pill" data-i="${it.i}" data-ox="${n(p.x)}" data-oy="${n(p.y)}"><title>${esc(tip)}</title>`);
     b.push(`<rect x="${n(px)}" y="${n(py)}" width="${n(p.w)}" height="${n(p.h)}" rx="${PILL.r}" fill="${fill}" stroke="${stroke}" stroke-width="${PILL.stroke}"/>`);
@@ -241,22 +242,19 @@ __SYMBOLS__
   items.forEach(it => {
     const fill = it.hi ? C.highlight : C.point;
     const stroke = it.hi ? C.highlightStroke : C.pointStroke;
-    s.push(`<g class="gc-dot" data-i="${it.i}"><title>${esc(`${it.name} — ${data.axes.x.name} ${it.vx}, ${data.axes.y.name} ${it.vy}`)}</title>` +
+    s.push(`<g class="gc-dot" data-i="${it.i}"><title>${esc(`${it.name} — ${data.axes.x.name} ${fmtValue(it.vx)}, ${data.axes.y.name} ${fmtValue(it.vy)}`)}</title>` +
       `<circle cx="${n(it.cx)}" cy="${n(it.cy)}" r="${POINT.r}" fill="${fill}" stroke="${stroke}" stroke-width="${POINT.stroke}"/>` +
       `<text x="${n(it.cx)}" y="${n(it.cy + 4.2)}" text-anchor="middle" fill="${C.ink}" ${font(TYPE.pointNum)}>${it.i}</text></g>`);
   });
 
   // footer
-  const fIcon = chipDims(assets.logos.gooey, 26);
+  const fIcon = chipDims(assets.logos.gooey, 18);
   const cw = measure("© 2026", TYPE.footer);
-  const gw = measure("Gooey.AI", TYPE.footer);
-  const total = cw + 12 + fIcon.w + 7 + gw;
+  const total = cw + 12 + fIcon.w;
   let fx = CANVAS.w / 2 - total / 2;
   s.push(`<text x="${n(fx)}" y="${ANCHOR.footerBaseline}" fill="${C.ink2}" ${font(TYPE.footer)}>© ${esc((data.date.match(/\d{4}/) || ["2026"])[0])}</text>`);
   fx += cw + 12;
-  s.push(img(assets.logos.gooey, fx, ANCHOR.footerBaseline - 20, fIcon.w, fIcon.h));
-  fx += fIcon.w + 7;
-  s.push(`<text x="${n(fx)}" y="${ANCHOR.footerBaseline}" fill="${C.ink}" font-family="Inter" font-size="${TYPE.footer.size}" font-weight="700">Gooey.AI</text>`);
+  s.push(img(assets.logos.gooey, fx, ANCHOR.footerBaseline - 15, fIcon.w, fIcon.h));
 
   s.push(`</svg>`);
   const out = s.join("\n").replace("__SYMBOLS__", img.symbols());
